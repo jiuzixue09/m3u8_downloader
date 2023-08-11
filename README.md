@@ -3,7 +3,7 @@ m3u8（HLS流）下载，实现了AES解密、合并、多线程、批量下载
 
 # 1、开车姿势
 ## 1.1、导入源码中依赖的库（Python3）
-     beautifulsoup4、m3u8、pycryptodome、requests、threadpool
+     pip3 install -r requirements.txt
 ## 1.2、m3u8_input.txt文件格式
 &emsp;&emsp;本下载器支持批量下载，m3u8连接需要放在一个txt文本文件（utf-8编码）中，格式如下：
 ```python
