@@ -28,19 +28,14 @@ class M3u8Downloader:
         self.sum_count = 0
         # 已处理的ts
         self.done_count = 0
-        # cache path
-        self.cache_path = saveRootDirPath + "/cache"
-        self.logFile = None
         # download bytes(0.5/1 s)
         self.downloaded_bytes = 0
         # download speed
         self.download_speed = 0
 
-        # 设置log file
-        if not os.path.exists(self.cache_path):
-            os.makedirs(self.cache_path)
-        # log file
-        self.logFile = open(self.cache_path + "/log.log", "w+", encoding="utf-8")
+        # cache path
+        self.cache_path = None
+        self.logFile = None
 
     # 1、下载m3u8文件
     def getM3u8Info(self):
@@ -183,6 +178,7 @@ class M3u8Downloader:
     # 5、合并ts
     def mergeTs(self, ts_file_dir, output_file_path, cryptor, count):
         output_fp = open(output_file_path, "wb+")
+        failed = 0
         for index in range(count):
             self.printProcessBar(count, index + 1, 50)
             self.logFile.write("\t{0}\n".format(index))
@@ -199,14 +195,15 @@ class M3u8Downloader:
                 else:
                     output_fp.write(cryptor.decrypt(file_data))
             except Exception as e:
-                input_fp.close()
-                output_fp.close()
+                # failed += 1
+                # input_fp.close()
+                # output_fp.close()
                 print(e)
-                return False
+                # return False
             input_fp.close()
         print("")
         output_fp.close()
-        return True
+        return failed / count < 0.2
 
     # 6、删除ts文件
     def removeTsDir(self, ts_file_dir):
@@ -357,6 +354,14 @@ class M3u8Downloader:
             m3u8_info = row_data.split('|')
             title = m3u8_info[0]
             self.m3u8_url = m3u8_info[1]
+
+            # cache path
+            self.cache_path = saveRootDirPath + "/cache/" + title
+            self.logFile = None
+            if not os.path.exists(self.cache_path):
+                os.makedirs(self.cache_path)
+            # log file
+            self.logFile = open(self.cache_path + "/log.log", "w+", encoding="utf-8")
 
             # title中去除 \  /  :  *  ?  "  <  >  |字符，Windows系统中文件命名不能包含这些字符
             title = title.replace('\\', ' ', sys.maxsize)
